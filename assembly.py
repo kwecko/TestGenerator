@@ -33,6 +33,7 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 VER = "1.1" 
 
 # Define o caminho de alguns comandos
+# Script pode ser executado no Windows ou Linux/MAC
 if os.name == 'nt':
     CMD_TRMLPDF="rml2pdf.exe"
     CMD_PDFTK="C:\\Users\\kwecko\\Documents\\Aplicativos\\PDFTKBuilderPortable\\App\\pdftkbuilder\\pdftk.exe"
@@ -54,7 +55,7 @@ input_table = None
 # Variavel global que armanezara as estrutura da prova
 PDF = ""
 
-# Estrutura do Cabeçalho do arquivo
+# Estrutura do Cabeçalho do arquivo RML
 PDF_HEADER =  """\
 <!DOCTYPE document SYSTEM "rml_1_0.dtd"> 
 <document filename="%PROVA%.pdf" invariant="1">
@@ -67,7 +68,7 @@ PDF_HEADER =  """\
 	displayDocTitle="1"
 	lang="pt-BR"
     >
-	<!-- Modelo principal do doc com cabelhaco --> 
+	<!-- Modelo principal do doc com cabeçalho --> 
 	<pageTemplate id="main" pageSize="A4">
 		<pageGraphics>
 		<setFont name="Helvetica-Bold" size="13"/> <drawString x="%COORDENADA%" y="800"> 
@@ -191,7 +192,7 @@ PDF_HEADER =  """\
 
 	</storyPlace>
 	
-	<!-- Espaco necessario para livrar o cabecalho da prova -->
+	<!-- Espaco necessario para livrar o cabeçalho da prova -->
 	<spacer length="45"/>
 
     <!-- Corpo do Documento --> 
@@ -335,7 +336,6 @@ def func_objetiva01(N_Q, Q):
         
     # Adiciona um espaco
     PDF = PDF + "<!-- Espaco --> \n <hr color=\"white\" thickness=\"4pt\"/> \n "
-
 
 # Formata as questoes Objetiva, tipo 2
 # ++++++++++++++++++++++++++++++++++++
@@ -622,10 +622,10 @@ for q in range(int(N_TEST)):
 <!-- Caso o n de pag seja maior que 1 -->
 <docIf cond="x&gt;1">
    
-    <!-- Caso o n de pag seja impar, acrescenta o cod -->
+    <!-- Caso o n de pag seja impar, acrescenta o codigo para adicionar uma pag em branco. Util em impressoaras que imprimem em frente e verso -->
 	<docIf cond="i&gt;0">
         
-        <!-- Define o template em branco  e adiciona um espaco-->
+        <!-- Define o template em branco  e adiciona um espaco -->
 		<setNextTemplate name="second" />
 		<para> <xpre> &#160; </xpre> </para>
 
