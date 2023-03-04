@@ -29,8 +29,8 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 # Variáveis
 # ---------
 
-# Versao 1.0
-VER = "1.0" 
+# Versao 1.1
+VER = "1.1" 
 
 # Define o caminho de alguns comandos
 if os.name == 'nt':
@@ -336,6 +336,7 @@ def func_objetiva01(N_Q, Q):
     # Adiciona um espaco
     PDF = PDF + "<!-- Espaco --> \n <hr color=\"white\" thickness=\"4pt\"/> \n "
 
+
 # Formata as questoes Objetiva, tipo 2
 # ++++++++++++++++++++++++++++++++++++
 def func_objetiva02(N_Q, Q):
@@ -390,6 +391,71 @@ def func_objetiva02(N_Q, Q):
             PDF = PDF + "<tr><td><para style=\"questoes\">  " + OPCOES[n] + " </para></td> \n <td><para style=\"normal\"> " + OPCOES[n+1] + "</para></td></tr> \n"
         else : 
             PDF = PDF + "<tr><td><para style=\"questoes\">  " + OPCOES[n] + " </para> \n </td><td><para style=\"normal\">  </para></td></tr> \n"
+    
+    PDF = PDF + "</blockTable> \n"
+    
+    # Adiciona um espaco
+    PDF = PDF + "<!-- Espaco --> \n <hr color=\"white\" thickness=\"4pt\"/> \n "
+
+# Formata as questoes Objetiva, tipo 3, 3 Colunas 
+# +++++++++++++++++++++++++++++++++++++++++++++++
+def func_objetiva03(N_Q, Q):
+    
+    #* Variaveis
+    global PDF
+    AFIRMATIVA = []
+    T_AFIRMATIVA = []
+    OPCOES = []
+    T_OPCOES = []
+
+    PDF = PDF + "\n <para style=\"questoes\" hyphenationLang=\"pt_BR\"> " + str(N_Q) + ") " + Q[2] + " (" +  FormatNumber(Q[1]) + ")  \n </para>"
+    PDF = PDF + "<!-- Espaco --> \n <hr color=\"white\" thickness=\"2pt\"/> \n "
+
+    #Procura por Opcoes de resposta, caso contrario é uma afirmação/negação
+    for i in range(3, len(Q)):
+        if "R:" in Q[i]:
+            # &#160; Codigo HTML do espaco; <xpre> intepreta esses codigos 
+            T_OPCOES.append("<xpre> (&#160;&#160;&#160;&#160;) </xpre>" + Q[i].replace('R:', ''))
+        else:
+            T_AFIRMATIVA.append(Q[i])
+
+    # Sorteio da Afirmativas/Negativas
+    la = list(range(len(T_AFIRMATIVA)))
+    random.shuffle(la)
+
+    for n in la:
+        AFIRMATIVA.append(T_AFIRMATIVA[n])
+
+    # Sorteio da ordem das Opcoes 
+    l = list(range(len(T_OPCOES)))
+    random.shuffle(l)
+
+    for n in l:
+        OPCOES.append(T_OPCOES[n])
+
+    # Adiciona as Afirmativas e Negativas ao documento
+    for n in range(0,len(AFIRMATIVA)):
+        PDF = PDF + "\n <para style=\"normal_justify\" hyphenationLang=\"pt_BR\"> " + Int2Roman(n+1) + " - " + AFIRMATIVA[n]  + " </para> \n"
+    
+    # + Coloca as opcoes uma abaixo da outra
+    #PDF = PDF + "<spacer length=\"8\"/>"
+    #for n in range(0,len(OPCOES)):
+    #    PDF = PDF + "\n <para style=\"normal\" hyphenationLang=\"pt_BR\"> " + OPCOES[n]  + " </para> \n"
+
+    # Coloca as opcoes na forma de duas coluna
+    PDF= PDF + "<spacer length=\"2\"/> \n"
+    PDF= PDF + "<blockTable alignment=\"LEFT\" colWidths=\"6cm,6cm,6cm\"> \n"
+
+    STEP_RANGE=3
+    for n in range(0,len(OPCOES),STEP_RANGE):
+        if n+2 < len(OPCOES): 
+            PDF = PDF + "<tr><td><para style=\"questoes\">  " + OPCOES[n] + " </para></td> \n <td><para style=\"normal\"> " + OPCOES[n+1] + "</para></td> \n" + "<td><para style=\"normal\"> " + OPCOES[n+2] + "</para></td></tr> \n"
+        else :
+            STEP_RANGE=2
+            if n+1 < len(OPCOES):
+                PDF = PDF + "<tr><td><para style=\"questoes\">  " + OPCOES[n] + " </para></td> \n <td><para style=\"normal\"> " + OPCOES[n+1] + "</para></td></tr> \n"
+            else:
+                PDF = PDF + "<tr><td><para style=\"questoes\">  " + OPCOES[n] + " </para> \n </td><td><para style=\"normal\">  </para></td></tr> \n"
     
     PDF = PDF + "</blockTable> \n"
     
@@ -538,6 +604,8 @@ for q in range(int(N_TEST)):
             func_objetiva01(i,QUESTIONS[n])
         elif QUESTIONS[n][0] == "objetiva02":
             func_objetiva02(i,QUESTIONS[n])
+        elif QUESTIONS[n][0] == "objetiva03":
+            func_objetiva03(i,QUESTIONS[n])
 
      
     # Finaliza o DOC PDF
