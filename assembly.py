@@ -14,7 +14,6 @@
 # -----------
 from os import name
 from sys import stderr
-from telnetlib import STATUS
 import openpyxl    
 from openpyxl.styles import Alignment, Font, Color, colors
 import random
@@ -29,8 +28,8 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 # Variáveis
 # ---------
 
-# Versao 1.1
-VER = "1.1" 
+# Versao 1.2
+VER = "1.2" 
 
 # Define o caminho de alguns comandos
 # Script pode ser executado no Windows ou Linux/MAC
@@ -150,6 +149,9 @@ PDF_HEADER =  """\
 
 		<blockAlignment value="RIGHT" start="1,0" stop="1,-1"/>
         <blockValign value="MIDDLE" start="1,0" stop="1,-1"/>
+
+        <blockAlignment value="RIGHT" start="2,0" stop="2,-1"/>
+        <blockValign value="MIDDLE" start="2,0" stop="2,-1"/>
 		
         <!-- Imprime as bordas/linhas da tabela -->
 		<!-- <lineStyle kind="GRID" colorName="darkblue"/> -->
@@ -240,11 +242,12 @@ def FormatNumber(n):
 def fun_discursiva(N_Q, Q):
     global PDF
     PDF = PDF + "\n <para style=\"questoes\" hyphenationLang=\"pt_BR\"> " + str(N_Q) + ") " + Q[2] + " (" +  FormatNumber(Q[1]) + ") </para> \n "
-    PDF = PDF + "<!-- Espaco --> \n <hr color=\"white\" thickness=\"6pt\"/> \n " 
+    PDF = PDF + "<!-- Espaco --> \n <spacer length=\"36\" width=\"72\"/> \n " 
 
-# Formata as questoes do tipo Coluna
+
+# # Formata as questoes do tipo Coluna, onde texto da Coluna 2 maior que a 1
 # ++++++++++++++++++++++++++++++++++++
-def fun_coluna(N_Q, Q):
+def fun_coluna01(N_Q, Q):
     
     #* Variaveis
     global PDF
@@ -295,11 +298,83 @@ def fun_coluna(N_Q, Q):
                COLUNA01.append("")
     
     # Adiciona as Colunas ao Documento
-    PDF= PDF + "<blockTable colWidths=\"4cm,2cm,12cm\" style=\"COLUNA\" > \n"
+    PDF= PDF + "<blockTable colWidths=\"5.5cm,2cm,11.5cm\" style=\"COLUNA\" > \n"
 
     for n in range(0,len(COLUNA01)):
         
-        PDF = PDF + "\t\t <tr><td>" + COLUNA01[n] + "</td> \t"
+        PDF = PDF + "\t\t <tr><td> <para style=\"coluna\">" + COLUNA01[n] + "</para></td> \t"
+
+        # Testa se a item na 2 coluna. Caso nao tenha remove os ( )  
+        if COLUNA02[n] != "" :
+            PDF = PDF + "<td> (     ) </td> \t"
+        else :
+             PDF = PDF + "<td> </td> \t"
+        
+        PDF = PDF + "<td><para style=\"coluna\">" + COLUNA02[n] + "</para></td></tr> \n"
+    
+    PDF = PDF + "</blockTable> \n"
+
+    # Adiciona um espaco
+    PDF = PDF + "<!-- Espaco --> \n <hr color=\"white\" thickness=\"4pt\"/> \n"
+
+# Formata as questoes do tipo Coluna, onde texto da Coluna 1 maior que a 2
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+def fun_coluna02(N_Q, Q):
+    
+    #* Variaveis
+    global PDF
+    COL_A = []
+    COL_B = []
+    COLUNA01 = []
+    COLUNA02 = []
+    
+    PDF = PDF + "\n <para style=\"questoes\" hyphenationLang=\"pt_BR\"> " + str(N_Q) + ") " + Q[2] + " (" +  FormatNumber(Q[1]) + ")  </para>\n "
+    PDF = PDF + "<!-- Espaco --> \n <hr color=\"white\" thickness=\"2pt\"/> \n "
+    
+    for i in range(3, len(Q)):
+        if "C:" in Q[i]:
+            COL_A.append(Q[i].replace('C:', ''))
+        else:
+            COL_B.append(Q[i].replace('R:', ''))
+   
+    # Sorteio da ordem da 1 Coluna
+    l = list(range(len(COL_A)))
+    random.shuffle(l)
+
+    ch = 'a'
+    L = chr(ord(ch))
+    for n in l:
+        if COL_A[n]: 
+            COLUNA01.append(L + ") " + COL_A[n])
+            L = chr(ord(L) + 1)
+    
+    # Sorteio da ordem da 2 Coluna 
+    l = list(range(len(COL_B)))
+    random.shuffle(l)
+
+    for n in l:
+        if COL_B[n]:
+            # &#160; Codigo HTML do espaco; <xpre> intepreta esses codigos 
+            #COLUNA02.append("<xpre> (&#160;&#160;&#160;&#160;) </xpre> " + COL_B[n])
+            COLUNA02.append(COL_B[n])
+
+
+    # Verifica os tamanhos das duas colunas. 
+    # Em caso de tamanho diferentes preenche com Vazio, deixando ambas com o mesmo tam.
+    if len(COLUNA01) !=  len(COLUNA02) :
+        if len(COLUNA01) > len(COLUNA02) :
+            for n in range(len(COLUNA02), len(COLUNA01)) :
+               COLUNA02.append("")
+        else:
+            for n in range(len(COLUNA01), len(COLUNA02)) :
+               COLUNA01.append("")
+    
+    # Adiciona as Colunas ao Documento
+    PDF= PDF + "<blockTable colWidths=\"12cm,2cm,6cm\" style=\"COLUNA\" > \n"
+
+    for n in range(0,len(COLUNA01)):
+        
+        PDF = PDF + "\t\t <tr><td> <para style=\"coluna\">" + COLUNA01[n] + "</para></td> \t"
 
         # Testa se a item na 2 coluna. Caso nao tenha remove os ( )  
         if COLUNA02[n] != "" :
@@ -598,8 +673,10 @@ for q in range(int(N_TEST)):
         i += 1
         if QUESTIONS[n][0] == "discursiva":
             fun_discursiva(i,QUESTIONS[n])
-        elif QUESTIONS[n][0] == "coluna":
-            fun_coluna(i,QUESTIONS[n])
+        elif QUESTIONS[n][0] == "coluna01":
+            fun_coluna01(i,QUESTIONS[n])
+        elif QUESTIONS[n][0] == "coluna02":
+            fun_coluna02(i,QUESTIONS[n])
         elif QUESTIONS[n][0] == "objetiva01":
             func_objetiva01(i,QUESTIONS[n])
         elif QUESTIONS[n][0] == "objetiva02":
