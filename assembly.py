@@ -31,7 +31,8 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 # Versao 1.3
 VER = "1.3"
 
-#Numero maximo de questoes lidas na planilha
+# Numero maximo de questoes lidas na planilha
+# Não pode ter linhas em branco entre questoes
 N_QUESTIONS=25
 
 # Define o caminho de alguns comandos
