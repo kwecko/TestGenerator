@@ -28,8 +28,11 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 # Variáveis
 # ---------
 
-# Versao 1.2
-VER = "1.2" 
+# Versao 1.3
+VER = "1.3"
+
+#Numero maximo de questoes lidas na planilha
+N_QUESTIONS=25
 
 # Define o caminho de alguns comandos
 # Script pode ser executado no Windows ou Linux/MAC
@@ -259,11 +262,16 @@ def fun_coluna01(N_Q, Q):
     PDF = PDF + "\n <para style=\"questoes\" hyphenationLang=\"pt_BR\"> " + str(N_Q) + ") " + Q[2] + " (" +  FormatNumber(Q[1]) + ")  </para>\n "
     PDF = PDF + "<!-- Espaco --> \n <hr color=\"white\" thickness=\"2pt\"/> \n "
     
+    #&lt; Codigo do <
+    #&gt; Codigo do >
+
     for i in range(3, len(Q)):
         if "C:" in Q[i]:
-            COL_A.append(Q[i].replace('C:', ''))
+            COL_A.append(Q[i].replace('C:', '').replace('<','&lt;').replace('>','&gt;'))
         else:
-            COL_B.append(Q[i].replace('R:', ''))
+            COL_B.append(Q[i].replace('R:', '').replace('<','&lt;').replace('>','&gt;'))
+        
+        
    
     # Sorteio da ordem da 1 Coluna
     l = list(range(len(COL_A)))
@@ -333,9 +341,9 @@ def fun_coluna02(N_Q, Q):
     
     for i in range(3, len(Q)):
         if "C:" in Q[i]:
-            COL_A.append(Q[i].replace('C:', ''))
+            COL_A.append(Q[i].replace('C:', '').replace('<','&lt;').replace('>','&gt;'))
         else:
-            COL_B.append(Q[i].replace('R:', ''))
+            COL_B.append(Q[i].replace('R:', '').replace('<','&lt;').replace('>','&gt;'))
    
     # Sorteio da ordem da 1 Coluna
     l = list(range(len(COL_A)))
@@ -624,7 +632,7 @@ else:
 OP_DESC=input("Entre com a Descrição da prova [Prova 1 Etapa]: ")
 
 # Pega as questoes de cada linha da tabela e armazena na tupla
-for rows in questions_page.iter_rows(min_row=2, max_row=20):
+for rows in questions_page.iter_rows(min_row=2, max_row=N_QUESTIONS):
         if rows[0].value :
             TEMP = []
             VALORES_Q.append(rows[1].value)
@@ -634,9 +642,12 @@ for rows in questions_page.iter_rows(min_row=2, max_row=20):
                 TEMP.append(rows[x].value)        
             QUESTIONS.append(TEMP)
 
+#Imprime o numero de questões 
+print("Numero de questoes: ", str(len(QUESTIONS)) );
+
 # Calcula o valor total da Prova
-i = 0
-for v in VALORES_Q: 
+i = 0.0
+for v in VALORES_Q:
     i = i + v
 
 print("Valor total da prova: " + "{:.2f}".format(i))
@@ -748,7 +759,7 @@ else :
 
 # Apaga os arquivos temporários. RML e PDF
 if os.name == 'nt':
-    os.system("del file.rml")
+    #os.system("del file.rml")
     os.system("del ??.pdf")
 else :
     os.system("rm *[0-9].pdf")
