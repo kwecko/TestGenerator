@@ -28,8 +28,8 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 # Variáveis
 # ---------
 
-# Versao 1.3
-VER = "1.3"
+# Versao 1.4
+VER = "1.4"
 
 # Numero maximo de questoes lidas na planilha
 # Não pode ter linhas em branco entre questoes
@@ -663,6 +663,16 @@ if not N_TEST.isdigit():
     print("Não entrou com um numero!")
     exit(2)
 
+# Le o numero que inicia a contagem das questões
+iNQ=input("Entre com a numero que inicia as questãos [1]: ")
+
+if  iNQ == "" :
+    iNQ = 0
+elif not iNQ.isdigit():
+    print("Não entrou com um numero!")
+    exit(3)
+else :
+    iNQ = int(iNQ) - 1
 
 # Gera a quantidade de provas estabelecidas 
 for q in range(int(N_TEST)):
@@ -677,8 +687,10 @@ for q in range(int(N_TEST)):
     l = list(range(len(QUESTIONS)))
     random.shuffle(l)
 
+    # Inicializa o contador de numero de questoes
+    i = iNQ
+
     # Analisa as questoes com base no sorteio
-    i = 0
     for n in l:
         # Caso nao haja espaço na folha, no caso 6.8cm, realiza uma quebra de pagina
         PDF = PDF + "\n <!-- Quebra de Pag caso necessario --> \n <condPageBreak height=\"6.8cm\"/> \n"
