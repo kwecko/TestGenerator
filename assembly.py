@@ -28,8 +28,8 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 # Variáveis
 # ---------
 
-# Versao 1.4
-VER = "1.4"
+# Versao 1.5
+VER = "1.5"
 
 # Numero maximo de questoes lidas na planilha
 # Não pode ter linhas em branco entre questoes
@@ -551,24 +551,34 @@ def func_objetiva03(N_Q, Q):
 ###########
 
 # lê da console o tabela com a estrutura do teste
-options, args = getopt.gnu_getopt(sys.argv[1:], 't:v', ['tabela =', 
-                                                            'version',
-                                                            ])
-# Analisa os parametros
+try:
+    options, args = getopt.gnu_getopt(sys.argv[1:], 't:vh', ['tabela =', 
+                                                            'version', 'help'])
+except getopt.GetoptError as err:
+        # print help information and exit:
+        print(err)  # Imprime o erro
+        print(f"Digite: {os.path.basename(sys.argv[0])} -h para visualizar as opções aceitas")
+        sys.exit(2)
+
+# Analisa os parâmetros
 for opt, arg in options:
     if opt in ['-t', '--tabela']:
         input_table = arg
     elif opt in ['-v', '--version'] :
-        print("Versao: " + VER)
+        print("Versão: " + VER)
+        exit(0)
+    elif opt in ['-h', '--help'] :
+        print(f"{os.path.basename(sys.argv[0])} -t | --tabela <tabela com as questoes>")
+        print(f"{os.path.basename(sys.argv[0])} -v | --version")
         exit(0)
 
-# Caso a Planilha nao seja declarada como parametro, usa o nome padrao no diretorio atual  
+# Caso a Planilha nao seja declarada como parâmetro, usa o nome padrão no diretório atual  
 if input_table is None:
     input_table="questions.xlsx"
 
 # Caso a Tabela informada nao exista 
 if 'input_table' not in locals():
-     print(sys.argv[0], " -t <tabela com as questoes>") 
+     print(os.path.basename(sys.argv[0]), " -t <tabela com as questoes>") 
      exit()
 
 # Checa se a planilha existe realmente
