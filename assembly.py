@@ -22,14 +22,15 @@ import os
 import codecs
 import getopt
 import sys 
+import signal
 
 from PyPDF2 import PdfFileReader, PdfFileWriter
 
 # Variáveis
 # ---------
 
-# Versao 1.5
-VER = "1.5"
+# Versao 1.6
+VER = "1.6"
 
 # Numero maximo de questoes lidas na planilha
 # Não pode ter linhas em branco entre questoes
@@ -207,6 +208,13 @@ PDF_HEADER =  """\
 
 # Funcoes 
 ##########
+
+# Função executada ao digitar Ctrl + C
+def handler(signum, frame):
+    msg = "\nCtrl-c foi pressionado. Script finalizado!"
+    print(msg, flush=True)
+    sys.exit(3)
+
 
 # Conversao de Decimal para Romano
 # ++++++++++++++++++++++++++++++++
@@ -495,7 +503,7 @@ def func_objetiva03(N_Q, Q):
     PDF = PDF + "\n <para style=\"questoes\" hyphenationLang=\"pt_BR\"> " + str(N_Q) + ") " + Q[2] + " (" +  FormatNumber(Q[1]) + ")  \n </para>"
     PDF = PDF + "<!-- Espaco --> \n <hr color=\"white\" thickness=\"2pt\"/> \n "
 
-    #Procura por Opcoes de resposta, caso contrario é uma afirmação/negação
+    #Procura por Opções de resposta, caso contrario é uma afirmação/negação
     for i in range(3, len(Q)):
         if "R:" in Q[i]:
             # &#160; Codigo HTML do espaco; <xpre> intepreta esses codigos 
@@ -521,7 +529,7 @@ def func_objetiva03(N_Q, Q):
     for n in range(0,len(AFIRMATIVA)):
         PDF = PDF + "\n <para style=\"normal_justify\" hyphenationLang=\"pt_BR\"> " + Int2Roman(n+1) + " - " + AFIRMATIVA[n]  + " </para> \n"
     
-    # + Coloca as opcoes uma abaixo da outra
+    # + Coloca as opções uma abaixo da outra
     #PDF = PDF + "<spacer length=\"8\"/>"
     #for n in range(0,len(OPCOES)):
     #    PDF = PDF + "\n <para style=\"normal\" hyphenationLang=\"pt_BR\"> " + OPCOES[n]  + " </para> \n"
@@ -549,6 +557,9 @@ def func_objetiva03(N_Q, Q):
 
 # Principal
 ###########
+
+# Vincula o pressionamento das teclas Ctrl+C a uma função 
+signal.signal(signal.SIGINT, handler)
 
 # lê da console a tabela com a estrutura do teste
 try:
@@ -617,9 +628,9 @@ elif OP_CURSO == "tads":
     PDF_HEADER = PDF_HEADER.replace('%LOGO%','tads.png')
 else:
     if OP_CURSO:
-        print("Opcao ", OP_CURSO, " inválida!")
+        print("Opção ", OP_CURSO, " inválida!")
     else :
-        print("Opcao inválida!")
+        print("Opção inválida!")
     exit(1)
 
 # Entradas do Curso e Nome da Disciplina
