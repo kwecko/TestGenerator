@@ -550,7 +550,7 @@ def func_objetiva03(N_Q, Q):
 # Principal
 ###########
 
-# lê da console o tabela com a estrutura do teste
+# lê da console a tabela com a estrutura do teste
 try:
     options, args = getopt.gnu_getopt(sys.argv[1:], 't:vh', ['tabela =', 
                                                             'version', 'help'])
