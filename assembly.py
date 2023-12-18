@@ -280,8 +280,7 @@ def fun_coluna01(N_Q, Q):
         else:
             COL_B.append(Q[i].replace('R:', '').replace('<','&lt;').replace('>','&gt;'))
         
-        
-   
+
     # Sorteio da ordem da 1 Coluna
     l = list(range(len(COL_A)))
     random.shuffle(l)
@@ -421,7 +420,7 @@ def func_objetiva01(N_Q, Q):
     random.shuffle(l)
 
     for n in l:
-        AFIRMATIVA.append("<xpre> (&#160;&#160;&#160;&#160;) </xpre> \t" + Q[n])
+        AFIRMATIVA.append("<xpre> (&#160;&#160;&#160;&#160;) </xpre> \t" + str(Q[n]))
 
     for n in range(0,len(AFIRMATIVA)):
         PDF = PDF + "\n <para style=\"normal_justify\" hyphenationLang=\"pt_BR\"> " + AFIRMATIVA[n]  + " </para> \n"
