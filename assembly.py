@@ -420,7 +420,7 @@ def func_objetiva01(N_Q, Q):
     random.shuffle(l)
 
     for n in l:
-        AFIRMATIVA.append("<xpre> (&#160;&#160;&#160;&#160;) </xpre> \t" + str(Q[n]))
+        AFIRMATIVA.append("<xpre> (&#160;&#160;&#160;&#160;) </xpre> \t" + str(Q[n]).replace('<','&lt;').replace('>','&gt;'))
 
     for n in range(0,len(AFIRMATIVA)):
         PDF = PDF + "\n <para style=\"normal_justify\" hyphenationLang=\"pt_BR\"> " + AFIRMATIVA[n]  + " </para> \n"
